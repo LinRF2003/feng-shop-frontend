@@ -1,23 +1,23 @@
 <template>
 	<view class="cart">
-		<view class="top">
-			<view class="radio">
-				<radio :checked="selectAll" @click="selectAllButton" />
-			</view>
-			<view class="text">全选</view>
-		</view>
+
 		<view class="cart-list">
 			<CartItem v-for="(i,index) in 10" :key="index" ref="cartItem" @changePrice="changePrice"
 				@changeSelect="changeSelect"></CartItem>
 		</view>
 		<view class="bottom">
+			<view class="all-select">
+				<view class="radio">
+					<radio :checked="selectAll" @click="selectAllButton" />
+				</view>
+				<view class="text">全选</view>
+			</view>
 			<!-- {{allPrice}} -->
 			<view class="t">总金额:</view>
-
 			<view class="price">
-				<view class="b">￥{{parseInt(allPrice/100)}}</view>
+				<view class="b">￥{{parseInt(totalPrice/100)}}</view>
 				<view class="s">
-					.{{allPrice%100}}
+					.{{totalPrice%100}}
 				</view>
 
 			</view>
@@ -33,18 +33,18 @@
 		data() {
 			return {
 				selectAll: false,
-				allPrice: 0
+				totalPrice: 0
 			}
 		},
 		methods: {
 			// 全选按钮
 			selectAllButton() {
 				this.selectAll = this.selectAll ? false : true;
-				this.allPrice = 0;
+				this.totalPrice = 0;
 				console.log(this.$refs);
 				if (this.selectAll) {
 					this.$refs.cartItem.forEach(item => {
-						this.allPrice += item.productInfo.productInventory * 100 * item.productInfo.productPrice;
+						this.totalPrice += item.productInfo.productInventory * 100 * item.productInfo.productPrice;
 						item.productInfo.isSelect = 1;
 					})
 				} else {
@@ -56,7 +56,7 @@
 			// 改变商品总金额
 			changePrice(price) {
 				console.log(price);
-				this.allPrice += price
+				this.totalPrice += price
 			},
 			// 子组件改变选择时判断是否全选
 			changeSelect(isSelect) {
@@ -116,7 +116,7 @@
 				// console.log(item.productInfo.productInventory);
 				// console.log(item.productInfo.productPrice);
 				if (item.productInfo.isSelect) {
-					this.allPrice += item.productInfo.productInventory * 100 * item.productInfo.productPrice;
+					this.totalPrice += item.productInfo.productInventory * 100 * item.productInfo.productPrice;
 				}
 			})
 		}
@@ -127,38 +127,28 @@
 	.cart {
 		padding-bottom: 100rpx;
 
-		.top {
-			position: fixed;
-			top: var(--window-top);
-			z-index: 100;
-			display: flex;
-			align-items: center;
-			background: #fff;
-			width: 100%;
-			height: 80rpx;
-		}
-
-		.cart-list {
-			padding-top: 80rpx;
-		}
-
 		.bottom {
 			position: fixed;
 			z-index: 100;
 			width: 100vw;
 			background: #fff;
-			// justify-content: flex-end;
-			padding-left: 130rpx;
 			bottom: var(--window-bottom);
 			height: 100rpx;
 			display: flex;
 			align-items: center;
 
+			.all-select {
+				display: flex;
+				align-items: center;
+				background: #fff;
+			}
+
 			.price {
 				color: red;
 				display: flex;
 				align-items: flex-end;
-
+				flex: 1;
+				justify-content: flex-end;
 				.b {
 					font-size: 48rpx;
 				}

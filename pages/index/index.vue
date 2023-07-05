@@ -28,6 +28,13 @@
 				uni.reLaunch({
 					url: "../../pages/login/login"
 				})
+			}else{
+				// 获取用户信息
+				let result = await this.$Request({url:"/user/get"})
+				if(result.code === 200){
+					uni.setStorageSync("userInfo",result.userInfo);
+					console.log(uni.getStorageSync("userInfo"));
+				}
 			}
 
 			// 获取分类

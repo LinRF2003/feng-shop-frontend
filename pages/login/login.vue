@@ -75,6 +75,14 @@
 							url: "../../pages/index/index"
 						})
 
+						// 获取用户信息
+						let res = await this.$Request({
+							url: "/user/get"
+						})
+						if (res.code === 200) {
+							uni.setStorageSync("userInfo", res.userInfo);
+							console.log(uni.getStorageSync("userInfo"));
+						}
 
 					} else {
 						uni.showToast({

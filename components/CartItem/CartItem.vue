@@ -46,11 +46,11 @@
 		data() {
 			return {
 				oldNum: 8,
+				isSelect: 0,
 				productInfo: {
 					cover: "http://127.0.0.1:3000/images/default.png",
 					productId: 2,
 					isActive: 1,
-					isSelect: 0,
 					productName: "aaa",
 					productPrice: 888.99,
 					productInventory: 8
@@ -62,24 +62,24 @@
 			changeSelect() {
 				
 				// 给父组件发送信息
-				if (this.productInfo.isSelect) {
+				if (this.isSelect) {
 					this.$emit("changePrice",
 						-this.productInfo.productInventory * this.productInfo.productPrice * 100
 					)
-					this.productInfo.isSelect = 0;
+					this.isSelect = 0;
 				} else {
 					this.$emit("changePrice",
 						this.productInfo.productInventory * this.productInfo.productPrice * 100
 					)
-					this.productInfo.isSelect = 1;
+					this.isSelect = 1;
 				}
 				
 				// 给父组件发送消息判断是否全选
-				this.$emit("changeSelect",this.productInfo.isSelect)
+				this.$emit("changeSelect",this.isSelect)
 			},
 			// 改变选择的数量
 			changeProductInventory(e) {
-				if (this.productInfo.isSelect) {
+				if (this.isSelect) {
 					this.$emit("changePrice",
 						// productId: this.productInfo.productId,
 						// productInventory: e.value,
