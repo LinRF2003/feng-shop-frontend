@@ -77,7 +77,7 @@
 			},
 			// 结算
 			settlement() {
-				let orderList = []
+				let orderList = [];
 				this.$refs.cartItem.forEach(item => {
 					let orderInfo = {}
 					// console.log(this);
