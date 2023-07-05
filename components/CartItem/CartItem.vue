@@ -1,7 +1,7 @@
 <template>
 	<view class="cart-item">
 		<label class="radio">
-			<radio :checked="productInfo.isSelect === 1" @click="changeSelect" />
+			<radio :checked="isSelect === 1" @click="changeSelect" />
 		</label>
 		<view class="cover">
 			<image :src="productInfo.cover" mode="" class="image"></image>
@@ -45,18 +45,11 @@
 		name: "CartItem",
 		data() {
 			return {
-				oldNum: 8,
-				isSelect: 0,
-				productInfo: {
-					cover: "http://127.0.0.1:3000/images/default.png",
-					productId: 2,
-					isActive: 1,
-					productName: "aaa",
-					productPrice: 888.99,
-					productInventory: 8
-				}
+				oldNum: 0,
+				isSelect: 0
 			};
 		},
+		props:["productInfo"],
 		methods: {
 			// 改变选择
 			changeSelect() {
@@ -64,12 +57,12 @@
 				// 给父组件发送信息
 				if (this.isSelect) {
 					this.$emit("changePrice",
-						-this.productInfo.productInventory * this.productInfo.productPrice * 100
+						-this.productInfo.productInventory * (this.productInfo.productPrice * 100)
 					)
 					this.isSelect = 0;
 				} else {
 					this.$emit("changePrice",
-						this.productInfo.productInventory * this.productInfo.productPrice * 100
+						this.productInfo.productInventory * (this.productInfo.productPrice * 100)
 					)
 					this.isSelect = 1;
 				}
@@ -84,7 +77,7 @@
 						// productId: this.productInfo.productId,
 						// productInventory: e.value,
 						// productPrice: this.productInfo.productPrice,
-						(e.value - this.oldNum) * this.productInfo.productPrice * 100
+						(e.value - this.oldNum) * (this.productInfo.productPrice * 100)
 					)
 
 				}
@@ -92,13 +85,21 @@
 			},
 			// 选择数量 input 失去焦点
 			inputBlur(e){
-				
 				if (parseInt(e.detail.value) < 1) {
-					this.productInfo.productInventory = 1;
+					this.productInfo.productInventory = 1;	
 				} else if (parseInt(e.detail.value) > 999) {
 					this.productInfo.productInventory = 999;
 				}
+				this.$emit("changePrice",
+					// productId: this.productInfo.productId,
+					// productInventory: e.value,
+					// productPrice: this.productInfo.productPrice,
+					(this.productInfo.productInventory - this.oldNum) * (this.productInfo.productPrice * 100)
+				)
 			}
+		},
+		mounted() {
+			this.oldNum = this.productInfo.productInventory
 		}
 	}
 </script>

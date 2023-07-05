@@ -2,8 +2,10 @@
 	<view class="cart">
 
 		<view class="cart-list">
-			<CartItem v-for="(i,index) in 10" :key="index" ref="cartItem" @changePrice="changePrice"
-				@changeSelect="changeSelect"></CartItem>
+			<view class="item" v-for="item in productList" :key="item.productId" >
+			<CartItem  ref="cartItem" @changePrice="changePrice"
+				@changeSelect="changeSelect" :productInfo="item"></CartItem>
+				</view>
 		</view>
 		<view class="bottom">
 			<view class="all-select">
@@ -29,11 +31,13 @@
 </template>
 
 <script>
+import { nextTick } from 'process';
 	export default {
 		data() {
 			return {
 				selectAll: false,
-				totalPrice: 0
+				totalPrice: 0,
+				productList:[]
 			}
 		},
 		methods: {
@@ -70,7 +74,7 @@
 				// 循环判断是否全选
 				this.selectAll = true;
 				this.$refs.cartItem.forEach(item => {
-					if (!item.productInfo.isSelect) {
+					if (!item.isSelect) {
 						this.selectAll = false;
 					}
 				})
@@ -84,7 +88,7 @@
 					// console.log(item.productInfo.isSelect)
 					// console.log(item.productInfo.productInventory);
 					// console.log(item.productInfo.productPrice);
-					if (item.productInfo.isSelect) {
+					if (item.isSelect) {
 						orderInfo.productId = item.productInfo.productId;
 						orderInfo.productName = item.productInfo.productName;
 						orderInfo.productInventory = item.productInfo.productInventory;
@@ -97,28 +101,30 @@
 				console.log(orderList);
 			}
 		},
-		computed: {
-			// allPrice(){
-			// 	if(this.$refs.cartItem){
-			// 		this.$refs.cartItem.forEach(item => {
-			// 			console.log(item);
-			// 		})
-			// 	}
-			// 	console.log(this.$refs);
-
-			// 	return 1;
-			// }
-		},
 		mounted() {
-			this.$refs.cartItem.forEach(item => {
-				// console.log(this);
-				// console.log(item.productInfo.isSelect)
-				// console.log(item.productInfo.productInventory);
-				// console.log(item.productInfo.productPrice);
-				if (item.productInfo.isSelect) {
-					this.totalPrice += item.productInfo.productInventory * 100 * item.productInfo.productPrice;
-				}
+			// 获取购物车列表
+			let cartList = uni.getStorageSync("cart");
+			console.log(cartList);
+			if (cartList || cartList.userId === uni.getStorageSync("userInfo").userId) {
+				this.productList = cartList.productList;
+				console.log(this.productList);
+			}
+			
+			// 获取购物车金额
+		
+			nextTick(()=>{
+					console.log(this.$refs);
+				this.$refs.cartItem.forEach(item => {
+					// console.log(this);
+					// console.log(item.productInfo.isSelect)
+					// console.log(item.productInfo.productInventory);
+					// console.log(item.productInfo.productPrice);
+					if (item.productInfo.isSelect) {
+						this.totalPrice += item.productInfo.productInventory * (this.productInfo.productPrice * 100);
+					}
+				})
 			})
+		
 		}
 	}
 </script>
