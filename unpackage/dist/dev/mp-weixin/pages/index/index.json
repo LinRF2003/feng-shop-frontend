@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "fengShop",
+  "usingComponents": {
+    "u-sticky": "/uni_modules/uview-ui/components/u-sticky/u-sticky",
+    "u-tabs": "/uni_modules/uview-ui/components/u-tabs/u-tabs",
+    "product-item": "/components/ProductItem/ProductItem"
+  }
+}
