@@ -63,21 +63,13 @@
 			},
 			// 加入购物车
 			addCart() {
-				console.log(this.productDetailInfo);
-				// let info = {
-				// 	productName: this.productDetailInfo.productName,
-				// 	productId: this.productDetailInfo.productId,
-				// 	productPrice: this.productDetailInfo.productPrice,
-				// 	productInventory: this.productDetailInfo.productInventory,
-				// 	isActive: this.productDetailInfo.isActive,
-				// 	isSelect:1,
-				// 	cover: this.productDetailInfo.cover,
-				// 	num: 1
-				// }
+				// 把修改商品值设为 true
+				uni.setStorageSync("isChangeCart", true);
+				// 商品信息
 				let info = {
-						productId: this.productDetailInfo.productId,
-						isSelect:0,
-						num: 1
+					productId: this.productDetailInfo.productId,
+					isSelect: 0,
+					num: 1
 				}
 				// 下面判断购物车中是否有此信息时用到
 				let isHas = false;
@@ -97,10 +89,13 @@
 					cartList.productList.forEach(item => {
 						if (item.productId === info.productId) {
 							isHas = true;
-							if (item.num < info.productInventory) {
+							if (item.num < this.productDetailInfo.productInventory) {
 								item.num += 1;
-								cartList.totalNum += 1;
-								cartList.totalPrice += info.productPrice * 100;
+								if (item.isSelect) {
+									cartList.totalNum += 1;
+									cartList.totalPrice += this.productDetailInfo.productPrice * 100;
+								}
+
 							} else {
 								uni.showToast({
 									title: "购物车商品已达库存数量",
@@ -114,8 +109,6 @@
 				}
 				if (!isHas) {
 					cartList.productList.push(info);
-					cartList.totalNum += 1;
-					cartList.totalPrice += info.productPrice * 100;
 				}
 
 				uni.setStorageSync("cart", cartList);

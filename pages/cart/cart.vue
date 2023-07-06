@@ -20,7 +20,7 @@
 			<!-- {{allPrice}} -->
 			<view class="info">
 
-				<view class="t">共 {{totalNum}} 件</view>
+				<view class="t">共{{totalNum}}件</view>
 				<view class="t">总金额:</view>
 				<view class="price">
 					<view class="b">￥{{parseInt(totalPrice/100)}}</view>
@@ -117,38 +117,65 @@
 			}
 		},
 		onShow() {
-			console.log(111);
+
 			// 获取购物车列表
 			let cartList = uni.getStorageSync("cart");
-			console.log(cartList);
+
 			// 购物车中有数据
 			if (cartList || cartList.userId === uni.getStorageSync("userInfo").userId) {
 				this.productList = cartList.productList;
-				// this.totalNum = cartList.totalNum;
-				// this.totalPrice = cartList.totalPrice;
+				// 获取购物车金额
+				this.totalNum = cartList.totalNum;
+				this.totalPrice = cartList.totalPrice;
 			}
 
-			// 获取购物车金额
+		},
+		mounted() {
+		// 循环判断是否全选
+		this.selectAll = true;
+		this.$refs.cartItem.forEach(item => {
+			if (!item.product.isSelect) {
+				this.selectAll = false;
+			}
+		})	
+		},
+		onHide() {
 
-			nextTick(() => {
-				// 清空数据
-				this.totalPrice = 0;
-				this.totalNum = 0;
-				this.selectAll = true;
-				this.$refs.cartItem.forEach(item => {
-					// console.log(this);
-					// console.log(item.productInfo.productInfo.isSelect)
-					// console.log(item.productInfo.productInventory);
-					console.log(item.productInfo.productPrice);
-					if (item.product.isSelect) {
-						this.totalPrice += item.product.num * (item.productInfo.productPrice * 100);
-						this.totalNum += item.product.num;
-					} else {
-						this.selectAll = false;
-					}
-				})
+			// 判断购物车信息是否修改
+			let cartList = {
+				productList: [],
+				totalPrice: this.totalPrice,
+				totalNum: this.totalNum,
+				userId: uni.getStorageSync("userInfo").userId
+			};
+			// 商品信息
+
+			this.$refs.cartItem.forEach(item => {
+				let productInfo = {
+					productId: item.product.productId,
+					isSelect: item.product.isSelect,
+					num: item.product.num
+				}
+				cartList.productList.push(productInfo);
 			})
+			// 写入缓存
+			uni.setStorageSync("cart", cartList);
+			// this.totalNum = cartList.totalNum;
+			// this.totalPrice = cartList.totalPrice;
+			// 把购物车信息写入数据库
+			this.$Request({
+				url: "/cart/update",
+				data: {
+					list: JSON.stringify(cartList.productList),
+					// 转换下数据
+					totalPrice: parseFloat((cartList.totalPrice / 100) + "." + (cartList.totalPrice % 100)),
+					totalNum: cartList.totalNum
+				}
+			})
+			uni.setStorageSync("isChangeCart", false)
+
 		}
+
 	}
 </script>
 
@@ -174,7 +201,8 @@
 			height: 100rpx;
 			display: flex;
 			align-items: center;
-
+			padding: 0 10px;
+			box-sizing: border-box;
 			.all-select {
 				display: flex;
 				align-items: center;

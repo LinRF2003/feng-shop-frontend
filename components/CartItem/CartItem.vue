@@ -4,7 +4,7 @@
 			<radio :checked="product.isSelect === 1" @click="changeSelect" v-if="productInfo.isActive" />
 			<radio disabled v-else />
 		</label>
-		<view class="cover">
+		<view class="cover" v-if="productInfo.cover">
 			<image :src="ImgUrl + productInfo.cover" mode="" class="image"></image>
 		</view>
 		<view class="right">
@@ -67,9 +67,9 @@
 					this.product.isSelect = 0;
 				} else {
 					this.$emit("changePrice", {
-							price: this.product.num * (this.productInfo.productPrice * 100),
-							num: this.product.num
-						})
+						price: this.product.num * (this.productInfo.productPrice * 100),
+						num: this.product.num
+					})
 					this.product.isSelect = 1;
 				}
 
@@ -97,7 +97,7 @@
 				if (parseInt(e.detail.value) < 1) {
 					this.product.num = 1;
 				} else if (parseInt(e.detail.value) > this.productInfo.productInventory) {
-					this.product.num =  this.productInfo.productInventory;
+					this.product.num = this.productInfo.productInventory;
 				}
 				if (this.product.isSelect) {
 					this.$emit("changePrice",
@@ -106,15 +106,15 @@
 						// productPrice: this.productInfo.productPrice,
 						{
 							price: (this.product.num - this.oldNum) * (this.productInfo.productPrice * 100),
-							num: 	this.product.num - this.oldNum
+							num: this.product.num - this.oldNum
 						}
-						
-					
+
+
 					)
-					
+
 				}
-				this.oldNum = this.product.num;	
-			
+				this.oldNum = this.product.num;
+
 			},
 			// 获取商品详情数据
 			async getProductDetail(productId) {
@@ -133,6 +133,10 @@
 			this.getProductDetail(this.product.productId)
 			this.oldNum = this.product.num;
 			this.ImgUrl = this.$ImageUrl;
+			if(!this.product.isSelect){
+				// 给父组件发送消息判断是否全选
+				this.$emit("changeSelect", this.product.isSelect)
+			}
 		}
 	}
 </script>
@@ -151,9 +155,16 @@
 
 		.right {
 			flex: 1;
+			height: 100%;
 
 			.name {
-				font-size: 28rpx
+				font-size: 28rpx;
+				margin-bottom: 20rpx;
+				word-break: break-all;
+				overflow: hidden;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
 			}
 
 			.box {
