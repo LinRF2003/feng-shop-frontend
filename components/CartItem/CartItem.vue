@@ -4,7 +4,7 @@
 			<radio :checked="isSelect === 1" @click="changeSelect" />
 		</label>
 		<view class="cover">
-			<image :src="productInfo.cover" mode="" class="image"></image>
+			<image :src="ImgUrl + productInfo.cover" mode="" class="image"></image>
 		</view>
 		<view class="right">
 			<view class="name">{{productInfo.productName}}</view>
@@ -17,17 +17,17 @@
 					</view>
 				</view>
 				<view class="number-box">
-					<u-number-box v-model="productInfo.productInventory" @change="changeProductInventory" min="1"
-						max="999" size="120">
-						<view slot="minus" class="minus" v-if="productInfo.productInventory!=1">
+					<u-number-box v-model="productInfo.num" @change="changeProductInventory" :min="1"
+						:max="productInfo.productInventory">
+						<view slot="minus" class="minus" v-if="productInfo.num!=1">
 							<u-icon name="minus" size="12" color="#FFFFFF"></u-icon>
 						</view>
 						<view slot="minus" class="disabled-bg" v-else>
 							<u-icon name="minus" color="#000" size="12"></u-icon>
 						</view>
-						<input slot="input" type="number" class="input" v-model="productInfo.productInventory"
-							maxlength="3" @blur="inputBlur">
-						<view slot="plus" class="plus" v-if="productInfo.productInventory!=999">
+						<input slot="input" type="number" class="input" v-model="productInfo.num" maxlength="3"
+							@blur="inputBlur">
+						<view slot="plus" class="plus" v-if="productInfo.num>=productInfo.productInventory">
 							<u-icon name="plus" color="#fff" size="12"></u-icon>
 						</view>
 						<view slot="plus" class="disabled-bg" v-else>
@@ -46,29 +46,30 @@
 		data() {
 			return {
 				oldNum: 0,
-				isSelect: 0
+				isSelect: 0,
+				ImgUrl: "",
 			};
 		},
-		props:["productInfo"],
+		props: ["productInfo"],
 		methods: {
 			// 改变选择
 			changeSelect() {
-				
+
 				// 给父组件发送信息
 				if (this.isSelect) {
 					this.$emit("changePrice",
-						-this.productInfo.productInventory * (this.productInfo.productPrice * 100)
+						-this.productInfo.num * (this.productInfo.productPrice * 100)
 					)
 					this.isSelect = 0;
 				} else {
 					this.$emit("changePrice",
-						this.productInfo.productInventory * (this.productInfo.productPrice * 100)
+						this.productInfo.num * (this.productInfo.productPrice * 100)
 					)
 					this.isSelect = 1;
 				}
-				
+
 				// 给父组件发送消息判断是否全选
-				this.$emit("changeSelect",this.isSelect)
+				this.$emit("changeSelect", this.isSelect)
 			},
 			// 改变选择的数量
 			changeProductInventory(e) {
@@ -84,9 +85,9 @@
 				this.oldNum = e.value;
 			},
 			// 选择数量 input 失去焦点
-			inputBlur(e){
+			inputBlur(e) {
 				if (parseInt(e.detail.value) < 1) {
-					this.productInfo.productInventory = 1;	
+					this.productInfo.productInventory = 1;
 				} else if (parseInt(e.detail.value) > 999) {
 					this.productInfo.productInventory = 999;
 				}
@@ -94,12 +95,13 @@
 					// productId: this.productInfo.productId,
 					// productInventory: e.value,
 					// productPrice: this.productInfo.productPrice,
-					(this.productInfo.productInventory - this.oldNum) * (this.productInfo.productPrice * 100)
+					(this.productInfo.num - this.oldNum) * (this.productInfo.productPrice * 100)
 				)
 			}
 		},
 		mounted() {
-			this.oldNum = this.productInfo.productInventory
+			this.oldNum = this.productInfo.num;
+			this.ImgUrl = this.$ImageUrl
 		}
 	}
 </script>

@@ -70,7 +70,8 @@
 					productPrice: this.productDetailInfo.productPrice,
 					productInventory: this.productDetailInfo.productInventory,
 					isActive: this.productDetailInfo.isActive,
-					cover: this.productDetailInfo.cover
+					cover: this.productDetailInfo.cover,
+					num: 1
 				}
 				// 下面判断购物车中是否有此信息时用到
 				let isHas = false;
@@ -79,14 +80,27 @@
 					// 初始化信息
 					cartList = {
 						productList: [],
+						totalPrice: 0,
+						totalNum: 0,
 						userId: uni.getStorageSync("userInfo").userId
 					}
 				} else {
+
+
 					// 判断购物车中是否有此信息
 					cartList.productList.forEach(item => {
 						if (item.productId === info.productId) {
-							item.productInventory += 1;
 							isHas = true;
+							if (item.num < info.productInventory) {
+								item.num += 1;
+								cartList.totalNum += 1;
+								cartList.totalPrice += info.productPrice * 100;
+							} else {
+								uni.showToast({
+									title: "购物车商品已达库存数量",
+									icon: "none"
+								})
+							}
 							return;
 						}
 					})
@@ -94,8 +108,11 @@
 				}
 				if (!isHas) {
 					cartList.productList.push(info);
+					cartList.totalNum += 1;
+					cartList.totalPrice += info.productPrice * 100;
 				}
-				uni.setStorageSync("cart", cartList)
+
+				uni.setStorageSync("cart", cartList);
 				console.log(cartList);
 				console.log(info);
 			}
