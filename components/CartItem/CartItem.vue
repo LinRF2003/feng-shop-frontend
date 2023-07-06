@@ -1,7 +1,8 @@
 <template>
 	<view class="cart-item">
 		<label class="radio">
-			<radio :checked="isSelect === 1" @click="changeSelect" />
+			<radio :checked="product.isSelect === 1" @click="changeSelect" v-if="productInfo.isActive" />
+			<radio disabled v-else />
 		</label>
 		<view class="cover">
 			<image :src="ImgUrl + productInfo.cover" mode="" class="image"></image>
@@ -17,7 +18,7 @@
 					</view>
 				</view>
 				<view class="number-box">
-					<u-number-box v-model="productInfo.num" @change="changeProductInventory" :min="1"
+					<u-number-box v-model="product.num" @change="changeProductInventory" :min="1"
 						:max="productInfo.productInventory">
 						<view slot="minus" class="minus" v-if="productInfo.num!=1">
 							<u-icon name="minus" size="12" color="#FFFFFF"></u-icon>
@@ -25,9 +26,9 @@
 						<view slot="minus" class="disabled-bg" v-else>
 							<u-icon name="minus" color="#000" size="12"></u-icon>
 						</view>
-						<input slot="input" type="number" class="input" v-model="productInfo.num" maxlength="3"
+						<input slot="input" type="number" class="input" v-model="product.num" maxlength="3"
 							@blur="inputBlur">
-						<view slot="plus" class="plus" v-if="productInfo.num>=productInfo.productInventory">
+						<view slot="plus" class="plus" v-if="product.num<productInfo.productInventory">
 							<u-icon name="plus" color="#fff" size="12"></u-icon>
 						</view>
 						<view slot="plus" class="disabled-bg" v-else>
@@ -46,39 +47,46 @@
 		data() {
 			return {
 				oldNum: 0,
-				isSelect: 0,
 				ImgUrl: "",
+				productInfo: {}
 			};
 		},
-		props: ["productInfo"],
+		props: ["product"],
 		methods: {
 			// 改变选择
 			changeSelect() {
 
 				// 给父组件发送信息
-				if (this.isSelect) {
-					this.$emit("changePrice",
-						-this.productInfo.num * (this.productInfo.productPrice * 100)
+				if (this.product.isSelect) {
+					this.$emit("changePrice", {
+							price: -this.product.num * (this.productInfo.productPrice * 100),
+							num: -this.product.num
+						}
+
 					)
-					this.isSelect = 0;
+					this.product.isSelect = 0;
 				} else {
-					this.$emit("changePrice",
-						this.productInfo.num * (this.productInfo.productPrice * 100)
-					)
-					this.isSelect = 1;
+					this.$emit("changePrice", {
+							price: this.product.num * (this.productInfo.productPrice * 100),
+							num: this.product.num
+						})
+					this.product.isSelect = 1;
 				}
 
 				// 给父组件发送消息判断是否全选
-				this.$emit("changeSelect", this.isSelect)
+				this.$emit("changeSelect", this.product.isSelect)
 			},
 			// 改变选择的数量
 			changeProductInventory(e) {
-				if (this.isSelect) {
+				if (this.product.isSelect) {
 					this.$emit("changePrice",
 						// productId: this.productInfo.productId,
 						// productInventory: e.value,
 						// productPrice: this.productInfo.productPrice,
-						(e.value - this.oldNum) * (this.productInfo.productPrice * 100)
+						{
+							price: (e.value - this.oldNum) * (this.productInfo.productPrice * 100),
+							num: e.value - this.oldNum
+						}
 					)
 
 				}
@@ -87,21 +95,44 @@
 			// 选择数量 input 失去焦点
 			inputBlur(e) {
 				if (parseInt(e.detail.value) < 1) {
-					this.productInfo.productInventory = 1;
-				} else if (parseInt(e.detail.value) > 999) {
-					this.productInfo.productInventory = 999;
+					this.product.num = 1;
+				} else if (parseInt(e.detail.value) > this.productInfo.productInventory) {
+					this.product.num =  this.productInfo.productInventory;
 				}
-				this.$emit("changePrice",
-					// productId: this.productInfo.productId,
-					// productInventory: e.value,
-					// productPrice: this.productInfo.productPrice,
-					(this.productInfo.num - this.oldNum) * (this.productInfo.productPrice * 100)
-				)
-			}
+				if (this.product.isSelect) {
+					this.$emit("changePrice",
+						// productId: this.productInfo.productId,
+						// productInventory: e.value,
+						// productPrice: this.productInfo.productPrice,
+						{
+							price: (this.product.num - this.oldNum) * (this.productInfo.productPrice * 100),
+							num: 	this.product.num - this.oldNum
+						}
+						
+					
+					)
+					
+				}
+				this.oldNum = this.product.num;	
+			
+			},
+			// 获取商品详情数据
+			async getProductDetail(productId) {
+				let result = await this.$Request({
+					url: "/product/getDetail",
+					data: {
+						productId
+					}
+				})
+				if (result.code === 200) {
+					this.productInfo = result.data;
+				}
+			},
 		},
 		mounted() {
-			this.oldNum = this.productInfo.num;
-			this.ImgUrl = this.$ImageUrl
+			this.getProductDetail(this.product.productId)
+			this.oldNum = this.product.num;
+			this.ImgUrl = this.$ImageUrl;
 		}
 	}
 </script>
@@ -120,6 +151,10 @@
 
 		.right {
 			flex: 1;
+
+			.name {
+				font-size: 28rpx
+			}
 
 			.box {
 				display: flex;
@@ -142,7 +177,7 @@
 					}
 
 					.input {
-						padding: 0 20rpx;
+						padding: 0 10rpx;
 						width: 48rpx;
 						text-align: center;
 						color: #000000;

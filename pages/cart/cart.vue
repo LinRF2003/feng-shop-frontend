@@ -1,11 +1,14 @@
 <template>
 	<view class="cart">
-
+		<view class="top">
+			<view class="title">购物车</view>
+			<view class="cart-manage">管理</view>
+		</view>
 		<view class="cart-list">
-			<view class="item" v-for="item in productList" :key="item.productId" >
-			<CartItem  ref="cartItem" @changePrice="changePrice"
-				@changeSelect="changeSelect" :productInfo="item"></CartItem>
-				</view>
+			<view class="item" v-for="item in productList" :key="item.productId">
+				<CartItem ref="cartItem" @changePrice="changePrice" @changeSelect="changeSelect" :product="item">
+				</CartItem>
+			</view>
 		</view>
 		<view class="bottom">
 			<view class="all-select">
@@ -15,15 +18,20 @@
 				<view class="text">全选</view>
 			</view>
 			<!-- {{allPrice}} -->
-			<view class="t">总金额:</view>
-			<view class="price">
-				<view class="b">￥{{parseInt(totalPrice/100)}}</view>
-				<view class="s">
-					.{{totalPrice%100}}
-				</view>
+			<view class="info">
 
+				<view class="t">共 {{totalNum}} 件</view>
+				<view class="t">总金额:</view>
+				<view class="price">
+					<view class="b">￥{{parseInt(totalPrice/100)}}</view>
+					<view class="s">
+						.{{totalPrice%100}}
+					</view>
+
+				</view>
 			</view>
-			<button @click="settlement">
+
+			<button @click="settlement" type="warn">
 				结算
 			</button>
 		</view>
@@ -31,13 +39,16 @@
 </template>
 
 <script>
-import { nextTick } from 'process';
+	import {
+		nextTick
+	} from 'process';
 	export default {
 		data() {
 			return {
 				selectAll: false,
 				totalPrice: 0,
-				productList:[]
+				totalNum: 0,
+				productList: []
 			}
 		},
 		methods: {
@@ -45,22 +56,29 @@ import { nextTick } from 'process';
 			selectAllButton() {
 				this.selectAll = this.selectAll ? false : true;
 				this.totalPrice = 0;
+				this.totalNum = 0;
 				console.log(this.$refs);
 				if (this.selectAll) {
 					this.$refs.cartItem.forEach(item => {
-						this.totalPrice += item.productInfo.productInventory * 100 * item.productInfo.productPrice;
-						item.productInfo.isSelect = 1;
+						this.totalPrice += item.product.num * 100 * item.productInfo.productPrice;
+						item.product.isSelect = 1;
+						this.totalNum += item.product.num;
 					})
 				} else {
 					this.$refs.cartItem.forEach(item => {
-						item.productInfo.isSelect = 0;
+						item.product.isSelect = 0;
 					})
 				}
 			},
 			// 改变商品总金额
-			changePrice(price) {
+			changePrice({
+				price,
+				num
+			}) {
 				console.log(price);
-				this.totalPrice += price
+				console.log(num);
+				this.totalPrice += price;
+				this.totalNum += parseInt(num);
 			},
 			// 子组件改变选择时判断是否全选
 			changeSelect(isSelect) {
@@ -74,7 +92,7 @@ import { nextTick } from 'process';
 				// 循环判断是否全选
 				this.selectAll = true;
 				this.$refs.cartItem.forEach(item => {
-					if (!item.isSelect) {
+					if (!item.product.isSelect) {
 						this.selectAll = false;
 					}
 				})
@@ -85,15 +103,12 @@ import { nextTick } from 'process';
 				this.$refs.cartItem.forEach(item => {
 					let orderInfo = {}
 					// console.log(this);
-					// console.log(item.productInfo.isSelect)
+					// console.log(item.productInfo.productInfo.isSelect)
 					// console.log(item.productInfo.productInventory);
 					// console.log(item.productInfo.productPrice);
-					if (item.isSelect) {
+					if (item.product.isSelect) {
 						orderInfo.productId = item.productInfo.productId;
-						orderInfo.productName = item.productInfo.productName;
-						orderInfo.productInventory = item.productInfo.productInventory;
-						orderInfo.productPrice = item.productInfo.productPrice;
-						orderInfo.cover = item.productInfo.cover;
+						orderInfo.num = item.product.num;
 						orderList.push(orderInfo);
 					}
 
@@ -101,30 +116,38 @@ import { nextTick } from 'process';
 				console.log(orderList);
 			}
 		},
-		mounted() {
+		onShow() {
+			console.log(111);
 			// 获取购物车列表
 			let cartList = uni.getStorageSync("cart");
 			console.log(cartList);
+			// 购物车中有数据
 			if (cartList || cartList.userId === uni.getStorageSync("userInfo").userId) {
 				this.productList = cartList.productList;
-				console.log(this.productList);
+				// this.totalNum = cartList.totalNum;
+				// this.totalPrice = cartList.totalPrice;
 			}
-			
+
 			// 获取购物车金额
-		
-			nextTick(()=>{
-					console.log(this.$refs);
+
+			nextTick(() => {
+				// 清空数据
+				this.totalPrice = 0;
+				this.totalNum = 0;
+				this.selectAll = true;
 				this.$refs.cartItem.forEach(item => {
 					// console.log(this);
-					// console.log(item.productInfo.isSelect)
+					// console.log(item.productInfo.productInfo.isSelect)
 					// console.log(item.productInfo.productInventory);
-					// console.log(item.productInfo.productPrice);
-					if (item.productInfo.isSelect) {
-						this.totalPrice += item.productInfo.productInventory * (this.productInfo.productPrice * 100);
+					console.log(item.productInfo.productPrice);
+					if (item.product.isSelect) {
+						this.totalPrice += item.product.num * (item.productInfo.productPrice * 100);
+						this.totalNum += item.product.num;
+					} else {
+						this.selectAll = false;
 					}
 				})
 			})
-		
 		}
 	}
 </script>
@@ -132,6 +155,15 @@ import { nextTick } from 'process';
 <style lang="scss">
 	.cart {
 		padding-bottom: 100rpx;
+
+		.top {
+			display: flex;
+		}
+
+		.cart-list {
+			padding: 0 20rpx;
+
+		}
 
 		.bottom {
 			position: fixed;
@@ -149,21 +181,35 @@ import { nextTick } from 'process';
 				background: #fff;
 			}
 
-			.price {
-				color: red;
-				display: flex;
-				align-items: flex-end;
+			.info {
 				flex: 1;
+				display: flex;
+				align-items: center;
+				padding: 10rpx;
 				justify-content: flex-end;
-				.b {
-					font-size: 48rpx;
+
+				.t {
+					font-size: 28rpx;
+					margin-left: 5px;
 				}
 
-				.s {
-					font-size: 28rpx;
-					line-height: 52rpx;
+				.price {
+					color: red;
+					display: flex;
+					align-items: flex-end;
+
+
+					.b {
+						font-size: 48rpx;
+					}
+
+					.s {
+						font-size: 26rpx;
+						line-height: 52rpx;
+					}
 				}
 			}
+
 		}
 	}
 </style>

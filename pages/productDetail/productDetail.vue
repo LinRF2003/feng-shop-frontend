@@ -64,14 +64,20 @@
 			// 加入购物车
 			addCart() {
 				console.log(this.productDetailInfo);
+				// let info = {
+				// 	productName: this.productDetailInfo.productName,
+				// 	productId: this.productDetailInfo.productId,
+				// 	productPrice: this.productDetailInfo.productPrice,
+				// 	productInventory: this.productDetailInfo.productInventory,
+				// 	isActive: this.productDetailInfo.isActive,
+				// 	isSelect:1,
+				// 	cover: this.productDetailInfo.cover,
+				// 	num: 1
+				// }
 				let info = {
-					productName: this.productDetailInfo.productName,
-					productId: this.productDetailInfo.productId,
-					productPrice: this.productDetailInfo.productPrice,
-					productInventory: this.productDetailInfo.productInventory,
-					isActive: this.productDetailInfo.isActive,
-					cover: this.productDetailInfo.cover,
-					num: 1
+						productId: this.productDetailInfo.productId,
+						isSelect:0,
+						num: 1
 				}
 				// 下面判断购物车中是否有此信息时用到
 				let isHas = false;
