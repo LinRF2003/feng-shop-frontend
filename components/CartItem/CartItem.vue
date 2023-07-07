@@ -17,27 +17,28 @@
 						{{String(productInfo.productPrice).substring(String(productInfo.productPrice).length-2)}}
 					</view>
 				</view>
-				<view class="number-box">
-					<u-number-box v-model="product.num" @change="changeProductInventory" :min="1"
-						:max="productInfo.productInventory">
-						<view slot="minus" class="minus" v-if="productInfo.num!=1">
-							<u-icon name="minus" size="12" color="#FFFFFF"></u-icon>
-						</view>
-						<view slot="minus" class="disabled-bg" v-else>
-							<u-icon name="minus" color="#000" size="12"></u-icon>
-						</view>
-						<input slot="input" type="number" class="input" v-model="product.num" maxlength="3"
-							@blur="inputBlur">
-						<view slot="plus" class="plus" v-if="product.num<productInfo.productInventory">
-							<u-icon name="plus" color="#fff" size="12"></u-icon>
-						</view>
-						<view slot="plus" class="disabled-bg" v-else>
-							<u-icon name="plus" color="#000" size="12"></u-icon>
-						</view>
-					</u-number-box>
-				</view>
+
 			</view>
 		</view>
+		<view class="number-box" v-if="product" v-show="!isManage">
+			<u-number-box v-model="product.num" @change="changeProductInventory" :min="1"
+				:max="productInfo.productInventory">
+				<view slot="minus" class="minus" v-if="productInfo.num!=1">
+					<u-icon name="minus" size="12" color="#FFFFFF"></u-icon>
+				</view>
+				<view slot="minus" class="disabled-bg" v-else>
+					<u-icon name="minus" color="#000" size="12"></u-icon>
+				</view>
+				<input slot="input" type="number" class="input" v-model="product.num" maxlength="3" @blur="inputBlur">
+				<view slot="plus" class="plus" v-if="product.num<productInfo.productInventory">
+					<u-icon name="plus" color="#fff" size="12"></u-icon>
+				</view>
+				<view slot="plus" class="disabled-bg" v-else>
+					<u-icon name="plus" color="#000" size="12"></u-icon>
+				</view>
+			</u-number-box>
+		</view>
+		<button class="del-button" v-show="isManage" @click="delCart">删除</button>
 	</view>
 </template>
 
@@ -52,11 +53,10 @@
 				product: null
 			};
 		},
-		props: ["product2"],
+		props: ["product2", "isManage"],
 		methods: {
 			// 改变选择
 			changeSelect() {
-
 				// 给父组件发送信息
 				if (this.product.isSelect) {
 					this.$emit("changePrice", {
@@ -129,10 +129,29 @@
 					this.productInfo = result.data;
 				}
 			},
+			// 删除购物车中当前商品信息
+			delCart() {
+				console.log(this.product.productId);
+				console.log(this.productInfo.productPrice);
+				console.log(this.product.num);
+				// 选中状态下
+				if (this.product.isSelect) {
+					this.$emit("delCart", {
+						productId: this.productInfo.productId,
+						changePrice: this.productInfo.productPrice * 100 * this.product.num,
+						changeNum: this.product.num
+					})
+				} else {
+					this.$emit("delCart", {
+						productId: this.productInfo.productId,
+						changePrice: 0,
+						changeNum: 0
+					})
+				}
+			}
 		},
 		mounted() {
 			this.product = this.product2;
-			console.log(this.product);
 			this.getProductDetail(this.product.productId)
 			this.oldNum = this.product.num;
 			this.ImgUrl = this.$ImageUrl;
@@ -175,57 +194,6 @@
 				display: flex;
 				align-items: center;
 
-				.number-box {
-					background: #ebecee;
-					border-radius: 44rpx;
-
-					// 步进器样式start
-					.minus {
-						width: 44rpx;
-						height: 44rpx;
-						border-radius: 50%;
-						@include flex;
-						justify-content: center;
-						align-items: center;
-						background-color: #304D99;
-						border: 1rpx solid #dddddd;
-					}
-
-					.input {
-						padding: 0 10rpx;
-						width: 48rpx;
-						text-align: center;
-						color: #000000;
-						font-size: 24rpx;
-					}
-
-					.plus {
-						width: 44rpx;
-						height: 44rpx;
-						background-color: #304D99;
-						border-radius: 50%;
-						/* #ifndef APP-NVUE */
-						display: flex;
-						/* #endif */
-						justify-content: center;
-						align-items: center;
-					}
-
-					.disabled-bg {
-						width: 44rpx;
-						height: 44rpx;
-						background-color: #f7f8fa;
-						border-radius: 50%;
-						/* #ifndef APP-NVUE */
-						display: flex;
-						/* #endif */
-						justify-content: center;
-						align-items: center;
-					}
-
-					// 步进器样式end
-				}
-
 
 				.price {
 					flex: 1;
@@ -243,6 +211,62 @@
 					}
 				}
 			}
+		}
+
+		.del-button {
+			min-width: 160rpx;
+		}
+
+		.number-box {
+			background: #ebecee;
+			border-radius: 44rpx;
+			min-width: 160rpx;
+
+			// 步进器样式start
+			.minus {
+				width: 44rpx;
+				height: 44rpx;
+				border-radius: 50%;
+				@include flex;
+				justify-content: center;
+				align-items: center;
+				background-color: #304D99;
+				border: 1rpx solid #dddddd;
+			}
+
+			.input {
+				padding: 0 10rpx;
+				width: 48rpx;
+				text-align: center;
+				color: #000000;
+				font-size: 24rpx;
+			}
+
+			.plus {
+				width: 44rpx;
+				height: 44rpx;
+				background-color: #304D99;
+				border-radius: 50%;
+				/* #ifndef APP-NVUE */
+				display: flex;
+				/* #endif */
+				justify-content: center;
+				align-items: center;
+			}
+
+			.disabled-bg {
+				width: 44rpx;
+				height: 44rpx;
+				background-color: #f7f8fa;
+				border-radius: 50%;
+				/* #ifndef APP-NVUE */
+				display: flex;
+				/* #endif */
+				justify-content: center;
+				align-items: center;
+			}
+
+			// 步进器样式end
 		}
 	}
 </style>

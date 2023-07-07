@@ -2,11 +2,15 @@
 	<view class="cart">
 		<view class="top">
 			<view class="title">购物车</view>
-			<view class="cart-manage">管理</view>
+			<view class="cart-manage" @click="()=>{
+				isManage = isManage ? false : true;
+
+			}">管理</view>
 		</view>
 		<view class="cart-list">
 			<view class="item" v-for="item in productList" :key="item.productId">
-				<CartItem ref="cartItem" @changePrice="changePrice" @changeSelect="changeSelect" :product2="item">
+				<CartItem ref="cartItem" @changePrice="changePrice" @changeSelect="changeSelect" :product2="item"
+					:isManage="isManage" @delCart="delCart">
 				</CartItem>
 			</view>
 		</view>
@@ -18,8 +22,7 @@
 				<view class="text">全选</view>
 			</view>
 			<!-- {{allPrice}} -->
-			<view class="info">
-
+			<view class="info" v-show="!isManage">
 				<view class="t">共{{totalNum}}件</view>
 				<view class="t">总金额:</view>
 				<view class="price">
@@ -29,11 +32,16 @@
 					</view>
 
 				</view>
+
 			</view>
 
-			<button @click="settlement" type="warn">
+			<button @click="settlement" type="warn" v-show="!isManage">
 				结算
 			</button>
+			<view class="del-all-button"> <button @click="deleteSelectCart" type="warn" v-show="isManage">
+					删除
+				</button></view>
+
 		</view>
 	</view>
 </template>
@@ -48,11 +56,13 @@
 				selectAll: false,
 				totalPrice: 0,
 				totalNum: 0,
-				productList: []
+				productList: [],
+				isManage: false, // 是否显示管理内容
+				selectManageAll: false
 			}
 		},
 		methods: {
-			// 全选按钮
+			// 全选商品按钮
 			selectAllButton() {
 				this.selectAll = this.selectAll ? false : true;
 				this.totalPrice = 0;
@@ -75,8 +85,7 @@
 				price,
 				num
 			}) {
-				console.log(price);
-				console.log(num);
+
 				this.totalPrice += price;
 				this.totalNum += parseInt(num);
 			},
@@ -114,6 +123,28 @@
 
 				})
 				console.log(orderList);
+			},
+			// 删除商品
+			delCart(e) {
+				console.log(e);
+				this.selectAll = true;
+				this.$refs.cartItem.forEach((item, index) => {
+
+					if (item.productInfo.productId === e.productId) {
+						// 修改数据
+						this.totalNum -= e.changeNum;
+						this.totalPrice -= e.changePrice;
+
+						// 删除页面中的数据
+						this.productList.splice(index, 1);
+
+					}
+					// 判断是否为全选
+					if (!item.product.isSelect && item.productInfo.productId !== e.productId) {
+						console.log(111);
+						this.selectAll = false;
+					}
+				})
 			}
 		},
 		onShow() {
@@ -131,18 +162,17 @@
 
 		},
 		mounted() {
-		// 循环判断是否全选
-		if(this.$refs.cartItem.length != 0){
-		this.selectAll = true;	
-		}
-		this.$refs.cartItem.forEach(item => {
-			if (!item.product.isSelect) {
-				this.selectAll = false;
+			// 循环判断是否全选
+			if (this.$refs.cartItem.length != 0) {
+				this.selectAll = true;
 			}
-		})	
+			this.$refs.cartItem.forEach(item => {
+				if (!item.product.isSelect) {
+					this.selectAll = false;
+				}
+			})
 		},
 		onHide() {
-
 			// 判断购物车信息是否修改
 			let cartList = {
 				productList: [],
@@ -151,7 +181,6 @@
 				userId: uni.getStorageSync("userInfo").userId
 			};
 			// 商品信息
-
 			this.$refs.cartItem.forEach(item => {
 				let productInfo = {
 					productId: item.product.productId,
@@ -183,14 +212,18 @@
 
 <style lang="scss">
 	.cart {
-		padding-bottom: 100rpx;
+		margin-bottom: 100rpx;
 
 		.top {
+			padding: 0 20rpx;
 			display: flex;
+			justify-content: space-between;
 		}
 
 		.cart-list {
+
 			padding: 0 20rpx;
+
 
 		}
 
@@ -203,8 +236,10 @@
 			height: 100rpx;
 			display: flex;
 			align-items: center;
+			justify-content: space-between;
 			padding: 0 10px;
 			box-sizing: border-box;
+
 			.all-select {
 				display: flex;
 				align-items: center;
