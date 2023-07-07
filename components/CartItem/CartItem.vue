@@ -48,10 +48,11 @@
 			return {
 				oldNum: 0,
 				ImgUrl: "",
-				productInfo: {}
+				productInfo: {},
+				product: null
 			};
 		},
-		props: ["product"],
+		props: ["product2"],
 		methods: {
 			// 改变选择
 			changeSelect() {
@@ -130,13 +131,16 @@
 			},
 		},
 		mounted() {
+			this.product = this.product2;
+			console.log(this.product);
 			this.getProductDetail(this.product.productId)
 			this.oldNum = this.product.num;
 			this.ImgUrl = this.$ImageUrl;
-			if(!this.product.isSelect){
+			if (!this.product.isSelect) {
 				// 给父组件发送消息判断是否全选
 				this.$emit("changeSelect", this.product.isSelect)
 			}
+
 		}
 	}
 </script>

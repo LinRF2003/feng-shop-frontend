@@ -6,7 +6,7 @@
 		</view>
 		<view class="cart-list">
 			<view class="item" v-for="item in productList" :key="item.productId">
-				<CartItem ref="cartItem" @changePrice="changePrice" @changeSelect="changeSelect" :product="item">
+				<CartItem ref="cartItem" @changePrice="changePrice" @changeSelect="changeSelect" :product2="item">
 				</CartItem>
 			</view>
 		</view>
@@ -132,7 +132,9 @@
 		},
 		mounted() {
 		// 循环判断是否全选
-		this.selectAll = true;
+		if(this.$refs.cartItem.length != 0){
+		this.selectAll = true;	
+		}
 		this.$refs.cartItem.forEach(item => {
 			if (!item.product.isSelect) {
 				this.selectAll = false;

@@ -1,5 +1,5 @@
 <template>
-	<view class="index">
+	<view class="index" >
 		<u-sticky bgColor="#fff">
 			<u-tabs :list="categoryList" keyName="categoryName" @click="changeCategory"></u-tabs>
 		</u-sticky>
@@ -7,6 +7,7 @@
 			<ProductItem v-for="item in productList" :key="item.productId" :productInfo="item" class="item">
 			</ProductItem>
 		</view>
+		<u-empty text="所谓伊人，在水一方" mode="list" v-if="productList.length === 0 && !loading"></u-empty>
 	</view>
 </template>
 
@@ -15,7 +16,12 @@
 		data() {
 			return {
 				categoryList: [],
-				productList: []
+				productList: [],
+				pageNo: 1,
+				pageSize: 20,
+				currentCategoryId: null,
+				isOver: false, // 数据是否获取完毕
+				loading:true// 数据加载中
 			}
 		},
 		async onLoad() {
@@ -26,19 +32,29 @@
 			const timeOver = 3 * 24 * 60 * 60 * 1000;
 			if (!token || !tokenStartTime || (Date.now() - tokenStartTime) > timeOver) {
 				uni.reLaunch({
-					url: "../../pages/login/login"
+					url: "../../pages/login/login",
 				})
-			}else{
+			} else {
 				// 获取用户信息
-				let result = await this.$Request({url:"/user/get"})
-				if(result.code === 200){
-					uni.setStorageSync("userInfo",result.userInfo);
+				let result = await this.$Request({
+					url: "/user/get"
+				})
+				if (result.code === 200) {
+					uni.setStorageSync("userInfo", result.userInfo);
 					console.log(uni.getStorageSync("userInfo"));
 				}
 			}
 
 			// 获取分类
 			this.getCategoryList();
+		},
+		// 下拉
+		onReachBottom(e) {
+			// 下拉刷新事件
+			// 添加数据
+			if (!this.isOver) {
+				this.getProductByCategoryId();
+			}
 		},
 		methods: {
 			// 获取分类
@@ -49,26 +65,50 @@
 				if (result.code === 200) {
 					this.categoryList = result.data;
 					// 初始化第一个商品列表
-					this.getProductByCategoryId(this.categoryList[0].categoryId);
+					this.currentCategoryId = this.categoryList[0].categoryId;
+					this.getProductByCategoryId();
 				}
 			},
 			// 获取分类商品
-			async getProductByCategoryId(categoryId) {
+			async getProductByCategoryId() {
+				this.loading = true;
+				uni.showLoading({
+					title: "数据加载中"
+				})
 				let result = await this.$Request({
 					url: "/product/getByCategoryId",
 					data: {
 						isActive: 1,
-						categoryId
+						categoryId: this.currentCategoryId,
+						pageNo: this.pageNo,
+						pageSize: this.pageSize
 					}
 				});
 				if (result.code === 200) {
-					this.productList = result.data.list
+					if (result.data.list.length === 0 && this.pageNo != 1 ) {
+							this.isOver = true;
+							uni.showToast({
+								title: "没有更多了",
+								duration: 2000,
+								icon: "none"
+							})
+						return;
+					}
+					this.productList = [...this.productList, ...result.data.list];
+					this.pageNo += 1;
 				}
+				this.loading = false;
+				uni.hideLoading();
 			},
 			// 改变分类
 			changeCategory(e) {
 				// console.log(categoryId);
-				this.getProductByCategoryId(e.categoryId);
+				// 数据清空
+				this.productList = [];
+				this.isOver = false;
+				this.pageNo = 1;
+				this.currentCategoryId = e.categoryId
+				this.getProductByCategoryId();
 			},
 
 		}
@@ -80,12 +120,14 @@
 		box-sizing: border-box;
 		background: #f4f4f4;
 		// min-height: calc(100% -100px);
-		min-height: calc(100vh - 94px);
+		// min-height: calc(100vh - 94px);
+		min-height: 100%;
 
 		.product-list {
 			padding: 10rpx;
 			display: flex;
 			flex-wrap: wrap;
+
 			.item {
 				// width: 100%;
 			}
