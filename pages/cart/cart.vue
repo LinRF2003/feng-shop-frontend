@@ -117,6 +117,27 @@
 			},
 			// 结算
 			settlement() {
+				// 购物车选中数据
+				let cartDetail = {
+					productList: [],
+					totalNum: this.totalNum,
+					totalPrice: this.totalPrice
+				}
+				this.$refs.cartItem.forEach(item => {
+					if (item.product.isSelect) {
+						cartDetail.productList.push({
+							productPrice: item.productInfo.productPrice,
+							productId: item.productInfo.productId,
+							productName: item.productInfo.productName,
+							cover: item.productInfo.cover,
+							num: item.product.num
+						})
+					}
+				})
+
+				// 价格 名称 数量 封面图
+				// 把数据存入缓存
+				uni.setStorageSync("settlementCart", cartDetail);
 				// 前往结算页面
 				uni.navigateTo({
 					url: "/pages/settlement/settlement"
@@ -264,10 +285,10 @@
 			} else {
 				// 写入缓存
 				uni.setStorageSync("cart", {
-						productList: [],
-						totalPrice: 0,
-						totalNum: 0,
-						userId: uni.getStorageSync("userInfo").userId
+					productList: [],
+					totalPrice: 0,
+					totalNum: 0,
+					userId: uni.getStorageSync("userInfo").userId
 				});
 				// 把购物车信息写入数据库
 				this.$Request({

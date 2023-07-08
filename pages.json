@@ -45,6 +45,15 @@
             }
             
         }
+        ,{
+            "path" : "pages/myAddress/myAddress",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "我的收获地址",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
