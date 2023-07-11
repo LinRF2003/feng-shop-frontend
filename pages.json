@@ -54,6 +54,42 @@
             }
             
         }
+        ,{
+            "path" : "pages/addAddress/addAddress",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "添加收获地址",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/paymentSuccess/paymentSuccess",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "完成订单",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/myOrder/myOrder",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "我的订单",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/OrderDetail/OrderDetail",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "交易成功",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

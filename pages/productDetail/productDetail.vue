@@ -26,8 +26,11 @@
 			</view>
 		</view>
 		<view class="bottom">
-			<button type="warn" @click="addCart">
+			<button type="default" @click="addCart">
 				加入购物车
+			</button>
+			<button type="warn" @click="settlement">
+				立即购买
 			</button>
 		</view>
 	</view>
@@ -38,7 +41,7 @@
 		data() {
 			return {
 				productDetailInfo: {},
-				ImgUrl: "46  01 14",
+				ImgUrl: "",
 				productId: null,
 				bannerList: []
 			}
@@ -74,39 +77,31 @@
 				// 下面判断购物车中是否有此信息时用到
 				let isHas = false;
 				let cartList = uni.getStorageSync("cart");
-				if (!cartList || cartList.userId != uni.getStorageSync("userInfo").userId) {
-					// 初始化信息
-					cartList = {
-						productList: [],
-						totalPrice: 0,
-						totalNum: 0,
-						userId: uni.getStorageSync("userInfo").userId
-					}
-				} else {
-
-
-					// 判断购物车中是否有此信息
-					cartList.productList.forEach(item => {
-						if (item.productId === info.productId) {
-							isHas = true;
-							if (item.num < this.productDetailInfo.productInventory) {
-								item.num += 1;
-								if (item.isSelect) {
-									cartList.totalNum += 1;
-									cartList.totalPrice += this.productDetailInfo.productPrice * 100;
-								}
-
-							} else {
-								uni.showToast({
-									title: "购物车商品已达库存数量",
-									icon: "none"
-								})
+				// 判断购物车中是否有此信息
+				cartList.productList.forEach(item => {
+					if (item.productId === info.productId) {
+						isHas = true;
+						if (item.num < this.productDetailInfo.productInventory) {
+							item.num += 1;
+							if (item.isSelect) {
+								cartList.totalNum += 1;
+								cartList.totalPrice += this.productDetailInfo.productPrice * 100;
 							}
-							return;
-						}
-					})
 
-				}
+							uni.showToast({
+								title: "加入购物车成功",
+								icon: "none"
+							})
+						} else {
+							uni.showToast({
+								title: "购物车商品已达库存数量",
+								icon: "none"
+							})
+						}
+						return;
+					}
+				})
+				// }
 				if (!isHas) {
 					cartList.productList.push(info);
 				}
@@ -114,6 +109,27 @@
 				uni.setStorageSync("cart", cartList);
 				console.log(cartList);
 				console.log(info);
+			},
+			settlement() {
+				this.productDetailInfo.num = 1;
+				// 购物车选中数据
+				let cartDetail = {
+					productList: [this.productDetailInfo],
+					totalNum: 1,
+					totalPrice: this.productDetailInfo.productPrice * 100
+				}
+
+				// // 价格 名称 数量 封面图
+
+				// 前往结算页面
+				// cartDetail.productList.num = 1;
+				// console.log(cartDetail.productList.num);
+				cartDetail.productList = JSON.stringify(cartDetail.productList);
+				// 存入缓存
+				uni.setStorageSync("settlementCart", cartDetail);
+				uni.navigateTo({
+					url: "/pages/settlement/settlement"
+				})
 			}
 		},
 		onLoad(options) {
@@ -160,8 +176,13 @@
 
 		.bottom {
 			position: fixed;
+			display: flex;
 			bottom: 0;
 			right: 0;
+
+			button {
+				margin-left: 20rpx;
+			}
 		}
 	}
 </style>

@@ -117,6 +117,13 @@
 			},
 			// 结算
 			settlement() {
+				if(this.totalNum === 0) {
+					return uni.showToast({
+						title:"还未选择商品",
+						icon:"none"
+					})
+					
+				}
 				// 购物车选中数据
 				let cartDetail = {
 					productList: [],
@@ -135,13 +142,17 @@
 					}
 				})
 
-				// 价格 名称 数量 封面图
-				// 把数据存入缓存
-				uni.setStorageSync("settlementCart", cartDetail);
+				// // 价格 名称 数量 封面图
+				
 				// 前往结算页面
+				cartDetail.productList=JSON.stringify(cartDetail.productList);
+				// 存入缓存
+				uni.setStorageSync("settlementCart",cartDetail);
 				uni.navigateTo({
-					url: "/pages/settlement/settlement"
+					url:"/pages/settlement/settlement"
 				})
+				// 路由传参获取
+				// uni.$u.route('/pages/settlement/settlement',cartDetail);
 			},
 			// 删除商品
 			delCart(e) {

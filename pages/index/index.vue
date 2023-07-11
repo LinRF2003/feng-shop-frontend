@@ -7,7 +7,7 @@
 			<ProductItem v-for="item in productList" :key="item.productId" :productInfo="item" class="item">
 			</ProductItem>
 		</view>
-		<u-empty text="所谓伊人，在水一方" mode="list" v-if="productList.length === 0 && !loading"></u-empty>
+		<u-empty text="该分类中还未加入商品" mode="list" v-if="productList.length === 0 && !loading"></u-empty>
 	</view>
 </template>
 
@@ -132,5 +132,6 @@
 				// width: 100%;
 			}
 		}
+
 	}
 </style>

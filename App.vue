@@ -1,15 +1,24 @@
 <script>
 	export default {
-		onLaunch: function() {
-			console.log('App Launch')
+		onLaunch: async function() {
+			console.log('App Launch');
+			// 获取购物车信息
+			let result =await this.$Request({
+					url: "/cart/get"
+				})
+			// 初始化信息
+			const cartList = {
+				productList: result.list,
+				totalPrice: result.totalNum,
+				totalNum: result.totalPrice,
+				userId:result.userId
+			}
 		},
 		onShow: function() {
 			console.log('App Show')
 		},
 		onHide: function() {
 			console.log('App Hide');
-
-
 			let isChangeCart = uni.getStorageSync("isChangeCart")
 			// 购物车中有数据
 			if (isChangeCart) {

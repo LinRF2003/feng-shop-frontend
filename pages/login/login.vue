@@ -5,7 +5,7 @@
 				<u--input v-model="userInfo.email" border="none" placeholder="请输入邮箱"></u--input>
 			</u-form-item>
 			<u-form-item label="密码" prop="password" borderBottom>
-				<u--input v-model="userInfo.password" border="none" placeholder="请输入密码"></u--input>
+				<u--input v-model="userInfo.password" border="none" placeholder="请输入密码" type="password"></u--input>
 			</u-form-item>
 			<u-button text="登录" type="primary" @click="login"></u-button>
 		</u--form>
@@ -104,7 +104,12 @@
 
 <style lang="scss">
 	.login {
+		background:#f4f4f4;
+		width: 100%;
+		height: calc(100vh - var(--window-top);
+		position: relative;
 		.u-form {
+			position: absolute;
 			box-sizing: border-box;
 			width: calc(100% - 40rpx);
 			padding: 40rpx;
@@ -113,7 +118,8 @@
 			align-items: center;
 			justify-content: center;
 			background: hsla(0, 0%, 100%, .7);
-			margin: 200rpx 20rpx;
+			top: 200rpx;
+			left:20rpx;
 			border-radius: 16px;
 
 			// box-shadow: 2px 2px 10px #ddd;
