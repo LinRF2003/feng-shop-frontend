@@ -2,7 +2,9 @@
 	<view class="my-address">
 		<view class="address-list" v-if="addressList.length > 0">
 			<view class="item" v-for="item in addressList" :key="item.addressId">
+				
 				<view class="info" @click="changeAddress(item)">
+				
 					<view class="t">
 						<view class="name">{{item.consigneeName}}</view>
 						<view class="phone">{{item.phone}}</view>
@@ -11,14 +13,23 @@
 					<view class="b">{{item.province}} {{item.city}} {{item.county + item.addressDetail}}</view>
 				</view>
 				<view class="edit-button">
-					<u-icon name="edit-pen" @click="editAddress(item)"></u-icon>
-					<u-icon name="trash-fill" @click="delAddress(item.addressId)"></u-icon>
+					
+					<view class="edit-icon"><u-icon name="edit-pen" @click="editAddress(item)"></u-icon></view>
+				
+					<u-icon name="trash-fill" @click="showModal(item.addressId)"></u-icon>
+					
 				</view>
+			
 			</view>
+	
 		</view>
 		<u-empty v-else mode="list" icon="http://cdn.uviewui.com/uview/empty/car.png">
 		</u-empty>
 		<button @click="addAddress" class="submit-btn">+ 添加收获地址</button>
+		<u-modal :show="showDelBox" :content="`你确定删除这个地址吗`" show-cancel-button close-on-click-overlay
+			width="400rpx" cancel-text="我再想想" confirm-text="删除" @cancel="closeModal" @confirm="delAddress"
+			@close="closeModal"></u-modal>
+		
 	</view>
 </template>
 
@@ -27,7 +38,9 @@
 		data() {
 			return {
 				addressList: [],
-				isSettlement: false
+				isSettlement: false,
+				showDelBox:false,
+				addressId:null // 将要删除的id
 			}
 		},
 		methods: {
@@ -41,8 +54,8 @@
 				}
 			},
 			addAddress() {
-				uni.navigateTo({
-					url: "/pages/addAddress/addAddress"
+				uni.redirectTo({
+					url: `/pages/addAddress/addAddress?isSettlement=${this.isSettlement}`
 				})
 			},
 			// 切换地址
@@ -60,6 +73,32 @@
 				uni.redirectTo({
 					url: `/pages/addAddress/addAddress?addressInfo=${JSON.stringify(addressInfo)}`
 				})
+			},
+			// 删除地址
+			async delAddress(){
+				let result = await this.$Request({
+					url: "/address/del",
+					data:{
+						addressId:this.addressId
+					}
+				});
+				if (result.code === 200) {
+					uni.showToast({
+						title:"删除成功",
+						icon:"none"
+					})
+					this.getAddress();
+						this.showDelBox = false;
+				}
+			},
+			// 关闭弹出层
+			closeModal() {
+				this.showDelBox = false;
+			},
+			// 显示弹出层
+			showModal(addressId) {
+				this.showDelBox = true;
+				this.addressId = addressId;
 			}
 		},
 		onBackPress() {
@@ -75,7 +114,6 @@
 			if (options.isSettlement) {
 				this.isSettlement = options.isSettlement
 			}
-			
 		},
 		onShow(){
 			this.getAddress();
@@ -103,10 +141,10 @@
 				justify-content: space-between;
 
 				.info {
-
+					flex:1;
 					.t {
 						display: flex;
-						align-items: flex-end;
+						align-items: center;
 						margin-bottom: 8rpx;
 
 						.name {
@@ -121,14 +159,28 @@
 						}
 
 						.default {
-							color: red;
-							font-size: 26rpx;
+							color: #ff7a00;
+							font-size: 24rpx;
+							border: 1px #ff7a00 solid;
+							padding: 2rpx;
+							border-radius: 8rpx;
 						}
 					}
 
 					.b {
+						max-width: 100%;
+						// word-wrap: normal;
 						font-size: 24rpx;
 						color: #666;
+						
+					}
+				}
+				.edit-button{
+					min-width: 120rpx;
+					display: flex;
+					justify-content: flex-end;
+					.edit-icon{
+						margin-right: 20rpx;
 					}
 				}
 			}

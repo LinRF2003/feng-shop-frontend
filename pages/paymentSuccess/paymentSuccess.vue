@@ -21,8 +21,9 @@
 		},
 		onBackPress() {
 			uni.switchTab({
-					url:"/pages/cart/cart"
+					url:"/pages/index/index"
 			})
+			return;
 		},
 		onLoad(options) {
 				if(options.orderId){

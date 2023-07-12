@@ -3,16 +3,18 @@
 		onLaunch: async function() {
 			console.log('App Launch');
 			// 获取购物车信息
-			let result =await this.$Request({
-					url: "/cart/get"
-				})
+			let result = await this.$Request({
+				url: "/cart/get"
+			})
 			// 初始化信息
 			const cartList = {
-				productList: result.list,
-				totalPrice: result.totalNum,
-				totalNum: result.totalPrice,
-				userId:result.userId
+				productList: JSON.parse(result.data.list),
+				totalPrice: result.data.totalPrice * 100,
+				totalNum: result.data.totalNum,
+				userId: result.data.userId
 			}
+			console.log(cartList);
+			uni.setStorageSync("cart", cartList)
 		},
 		onShow: function() {
 			console.log('App Show')
@@ -32,7 +34,8 @@
 					data: {
 						list: JSON.stringify(cartList.productList),
 						// 转换下数据
-						totalPrice: parseFloat((cartList.totalPrice / 100) + "." + (cartList.totalPrice % 100)),
+						totalPrice: parseFloat((cartList.totalPrice / 100) + "." + (cartList.totalPrice %
+							100)),
 						totalNum: cartList.totalNum
 					}
 				})
@@ -47,7 +50,10 @@
 <style lang="scss">
 	/*每个页面公共css */
 	@import "@/uni_modules/uview-ui/index.scss";
-	uni-page-body,html,body{  
-	            height: 100%;  
-	        }
+
+	uni-page-body,
+	html,
+	body {
+		height: 100%;
+	}
 </style>

@@ -49,8 +49,8 @@
 					phone: '',
 					addressDetail: '',
 					isDefault: 0,
-
 				},
+				isSettlement: false
 			}
 		},
 
@@ -69,19 +69,36 @@
 					return;
 				}
 				// 将收货地址数据提交到服务器
-				let result = await this.$Request({
-					url: "/address/add",
-					data: {
-						consigneeName: this.formData.consigneeName,
-						phone: this.formData.phone,
-						addressDetail: this.formData.addressDetail,
-						province: this.area[0],
-						city: this.area[1],
-						county: this.area[2],
-						isDefault: this.formData.isDefault,
-						addressId: this.addressId
-					}
-				})
+				let result;
+				if (this.addressId) {
+					result = await this.$Request({
+						url: "/address/add",
+						data: {
+							consigneeName: this.formData.consigneeName,
+							phone: this.formData.phone,
+							addressDetail: this.formData.addressDetail,
+							province: this.area[0],
+							city: this.area[1],
+							county: this.area[2],
+							isDefault: this.formData.isDefault,
+							addressId: this.addressId
+						}
+					})
+
+				} else {
+					result = await this.$Request({
+						url: "/address/add",
+						data: {
+							consigneeName: this.formData.consigneeName,
+							phone: this.formData.phone,
+							addressDetail: this.formData.addressDetail,
+							province: this.area[0],
+							city: this.area[1],
+							county: this.area[2],
+							isDefault: this.formData.isDefault
+						}
+					})
+				}
 
 
 				if (result.code === 200) {
@@ -96,6 +113,9 @@
 			},
 		},
 		onLoad(options) {
+			if (options.isSettlement) {
+				this.isSettlement = options.isSettlement
+			}
 			if (options.addressInfo) {
 				uni.setNavigationBarTitle({
 					title: "修改收获地址"
@@ -110,9 +130,15 @@
 			}
 		},
 		onBackPress() {
-			uni.redirectTo({
-				url: "/pages/myAddress/myAddress"
-			})
+			if (this.isSettlement) {
+				uni.redirectTo({
+					url: "/pages/myAddress/myAddress?isSettlement=true"
+				})
+			} else {
+				uni.redirectTo({
+					url: "/pages/myAddress/myAddress"
+				})
+			}
 			return true;
 		}
 	}

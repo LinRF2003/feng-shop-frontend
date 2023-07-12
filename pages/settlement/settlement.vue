@@ -89,6 +89,12 @@
 			},
 			// 提交订单
 			async submitOrder() {
+				if(!this.addressInfo){
+					return uni.showLoading({
+						title: "地址未填写",
+						icon:"none"
+					})
+				}
 				uni.showLoading({
 					title: "支付中"
 				})
@@ -138,10 +144,6 @@
 					if (!result.data) {
 						this.addressInfo = null
 						return;
-					}
-					if (this.addressInfo) {
-						console.log(this.addressInfo);
-						return
 					}
 					this.addressInfo = result.data;
 				}

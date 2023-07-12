@@ -1,5 +1,5 @@
 <template>
-	<view class="product-item" @click="goToProductDetail(productInfo.productId)">
+	<view class="product-item" @click="goToProductDetail(productInfo.productId)" v-if="productInfo.productInventory >= 0">
 		<view class="cover">
 			<image :src="ImgUrl + productInfo.cover" mode="widthFix"></image>
 			<!-- <image :src="$ImageUrl + productInfo.cover + productInfo.cover"></image> -->

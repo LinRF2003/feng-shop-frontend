@@ -15,12 +15,15 @@
 			<image :src="ImgUrl + productDetailInfo.cover" class="image"></image>
 		</view>
 		<view class="content">
-			<view class="price">
+			<view class="box"><view class="price">
 				<view class="b">￥{{Math.trunc(productDetailInfo.productPrice)}}</view>
 				<view class="s">
 					.{{String(productDetailInfo.productPrice).substring(String(productDetailInfo.productPrice).length-2)}}
 				</view>
 			</view>
+			<view>	库存: {{productDetailInfo.productInventory}}</view></view>
+			
+		
 			<view class="name">
 				{{productDetailInfo.productName}}
 			</view>
@@ -66,6 +69,12 @@
 			},
 			// 加入购物车
 			addCart() {
+				if(this.productDetailInfo.productInventory <= 0) {
+					return uni.showToast({
+						title:"商品库存为0，暂时不可购买",
+						icon:"none"
+					})
+				}
 				// 把修改商品值设为 true
 				uni.setStorageSync("isChangeCart", true);
 				// 商品信息
@@ -111,6 +120,12 @@
 				console.log(info);
 			},
 			settlement() {
+				if(this.productDetailInfo.productInventory <= 0) {
+					return uni.showToast({
+						title:"商品库存为0，暂时不可购买",
+						icon:"none"
+					})
+				}
 				this.productDetailInfo.num = 1;
 				// 购物车选中数据
 				let cartDetail = {
@@ -152,7 +167,10 @@
 
 		.content {
 			padding: 20rpx;
-
+			.box{
+				display: flex;
+				justify-content: space-between;
+			}
 			.price {
 				color: red;
 				display: flex;
