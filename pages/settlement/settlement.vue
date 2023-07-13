@@ -78,7 +78,8 @@
 				cartDetail: {},
 				ImgUrl: "",
 				addressInfo: null,
-				paymentType: '1'
+				paymentType: '1',
+				isCart:true
 			}
 		},
 		methods: {
@@ -102,7 +103,7 @@
 					url: "/order/add",
 					data: {
 						productList: JSON.stringify(this.cartDetail.productList),
-						totalPrice: this.cartDetail.totalPrice / 100 + this.cartDetail.totalPrice % 100 / 100,
+						totalPrice: parseInt(this.cartDetail.totalPrice / 100) + this.cartDetail.totalPrice % 100 / 100,
 						totalNum: this.cartDetail.totalNum,
 						address: this.addressInfo.fullAddress,
 						paymentType: this.paymentType,
@@ -111,22 +112,25 @@
 					}
 				})
 				if (result.code === 200) {
-
-					// 删除购物车中已支付的数据
-					// 获取购物车列表
-					// 获取id列表
-					let arr = [];
-					this.cartDetail.productList.forEach(item => {
-						arr.push(item.productId)
-					})
-					let cartList = uni.getStorageSync("cart");
-
-					cartList.productList = cartList.productList.filter(item => {
-						return !arr.includes(item.productId);
-					})
-					cartList.totalNum -= this.cartDetail.totalNum;
-					cartList.totalPrice -= this.cartDetail.totalPrice;
-					uni.setStorageSync("cart", cartList)
+					if(this.isCart){
+						console.log(this.isCart +"iscart");
+						// 删除购物车中已支付的数据
+						// 获取购物车列表
+						// 获取id列表
+						let arr = [];
+						this.cartDetail.productList.forEach(item => {
+							arr.push(item.productId)
+						})
+						let cartList = uni.getStorageSync("cart");
+						
+						cartList.productList = cartList.productList.filter(item => {
+							return !arr.includes(item.productId);
+						})
+						cartList.totalNum -= this.cartDetail.totalNum;
+						cartList.totalPrice -= this.cartDetail.totalPrice;
+						uni.setStorageSync("cart", cartList)
+					}
+					
 					uni.hideLoading();
 					// 跳转路由
 					uni.redirectTo({
@@ -168,6 +172,9 @@
 			if (options.addressInfo) {
 				this.addressInfo = JSON.parse(options.addressInfo);
 			}
+			if (options.isCart) {
+				this.isCart = false;
+			}
 		},
 		mounted() {
 			this.ImgUrl = this.$ImageUrl;
@@ -175,7 +182,9 @@
 			this.cartDetail = uni.getStorageSync("settlementCart");
 			this.cartDetail.productList = JSON.parse(this.cartDetail.productList);
 			console.log(this.cartDetail);
-			this.getDefaultAddress();
+			if(!this.addressInfo){
+				this.getDefaultAddress();
+			}
 		}
 	}
 </script>
@@ -224,12 +233,15 @@
 				border-bottom: 1px solid #efefef;
 				padding: 20rpx 0;
 				align-items: center;
-
+				image{
+					border-radius: 10rpx;
+				}
 				.product-info {
+					margin-left: 12rpx;
 					flex: 1;
-
+					
 					.product-name {
-						font-size: 30rpx;
+						font-size: 28rpx;
 						min-height: 120rpx;
 					}
 

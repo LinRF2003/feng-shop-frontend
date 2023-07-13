@@ -24,7 +24,7 @@
 						<view class="s">￥</view>
 						<view class="b">{{parseInt(orderInfo.totalPrice)}}</view>
 						<view class="s">
-							{{String(orderInfo.totalPrice).slice(String(orderInfo.totalPrice).length - 3 , String(orderInfo.totalPrice).length)}}
+							.{{String(orderInfo.totalPrice*100).substring(String(orderInfo.totalPrice*100).length-2)}}
 						</view>
 					</view>
 				</view>
@@ -44,6 +44,14 @@
 					</view>
 					<view class="right">
 						{{orderInfo.orderId}}
+					</view>
+				</view>
+				<view class="row">
+					<view class="left">
+						交易时间:
+					</view>
+					<view class="right">
+						{{orderInfo.createTime}}
 					</view>
 				</view>
 			</view>
@@ -106,7 +114,7 @@
 
 				.product-info {
 					flex: 1;
-
+					margin-left: 16rpx;
 					.product-name {
 						font-size: 28rpx;
 						min-height: 120rpx;

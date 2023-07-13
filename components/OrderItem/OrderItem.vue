@@ -26,7 +26,7 @@
 					<view class="s">￥</view>
 					<view class="b">{{parseInt(orderInfo.totalPrice)}}</view>
 					<view class="s">
-						{{String(orderInfo.totalPrice).slice(String(orderInfo.totalPrice).length - 3 , String(orderInfo.totalPrice).length)}}
+					.{{String(orderInfo.totalPrice*100).substring(String(orderInfo.totalPrice*100).length-2)}}
 					</view>
 				</view>	
 			
@@ -98,10 +98,10 @@
 				border-bottom: 1px solid #efefef;
 				padding: 20rpx 0;
 				align-items: center;
-
+				
 				.product-info {
 					flex: 1;
-
+					margin-left: 16rpx;
 					.product-name {
 						font-size: 28rpx;
 						min-height: 120rpx;

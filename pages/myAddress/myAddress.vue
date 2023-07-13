@@ -12,7 +12,7 @@
 					</view>
 					<view class="b">{{item.province}} {{item.city}} {{item.county + item.addressDetail}}</view>
 				</view>
-				<view class="edit-button">
+				<view class="edit-button" v-if="!isSettlement">
 					
 					<view class="edit-icon"><u-icon name="edit-pen" @click="editAddress(item)"></u-icon></view>
 				
@@ -104,14 +104,14 @@
 		onBackPress() {
 			if (this.isSettlement) {
 				uni.redirectTo({
-					url: `/pages/settlement/settlement`
+					url: `/pages/settlement/settlement?addressInfo=${JSON.stringify(addressInfo)}`
 				})
 				return true;
 			}
 
 		},
 		onLoad(options) {
-			if (options.isSettlement) {
+			if (options.isSettlement === 'true') {
 				this.isSettlement = options.isSettlement
 			}
 		},

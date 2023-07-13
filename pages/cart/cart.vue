@@ -171,9 +171,12 @@
 					}
 					// 判断是否为全选
 					if (!item.product.isSelect && item.productInfo.productId !== e.productId) {
-						console.log(111);
 						this.selectAll = false;
 					}
+					uni.showToast({
+						title:"删除成功",
+						icon:"none"
+					})
 				})
 			},
 			// 删除所有商品

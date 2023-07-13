@@ -113,7 +113,7 @@
 			},
 		},
 		onLoad(options) {
-			if (options.isSettlement) {
+			if (options.isSettlement === 'true') {
 				this.isSettlement = options.isSettlement
 			}
 			if (options.addressInfo) {
@@ -130,7 +130,7 @@
 			}
 		},
 		onBackPress() {
-			if (this.isSettlement) {
+			if (this.isSettlement) {	
 				uni.redirectTo({
 					url: "/pages/myAddress/myAddress?isSettlement=true"
 				})

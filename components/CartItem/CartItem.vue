@@ -14,7 +14,7 @@
 					<view class="s">￥</view>
 					<view class="b">{{Math.trunc(productInfo.productPrice)}}.</view>
 					<view class="s">
-						{{String(productInfo.productPrice).substring(String(productInfo.productPrice).length-2)}}
+							{{String(productInfo.productPrice*100).substring(String(productInfo.productPrice*100).length-2)}}
 					</view>
 				</view>
 
@@ -168,25 +168,26 @@
 	.cart-item {
 		display: flex;
 		align-items: center;
-
+		padding: 10px 0;
 		.cover {
 			.image {
 				width: 200rpx;
 				height: 200rpx;
+				border-radius: 16rpx;
 			}
 		}
 
 		.right {
 			flex: 1;
 			height: 100%;
-
+			margin:0 16rpx ;
 			.name {
-				font-size: 28rpx;
+				font-size: 24rpx;
 				margin-bottom: 20rpx;
 				word-break: break-all;
 				overflow: hidden;
 				display: -webkit-box;
-				-webkit-line-clamp: 2;
+				-webkit-line-clamp: 3;
 				-webkit-box-orient: vertical;
 			}
 

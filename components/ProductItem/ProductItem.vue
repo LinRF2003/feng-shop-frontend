@@ -13,7 +13,7 @@
 				<view class="s">￥</view>
 				<view class="b">{{Math.trunc(productInfo.productPrice)}}.</view>
 				<view class="s">
-					{{String(productInfo.productPrice).substring(String(productInfo.productPrice).length-2)}}
+					{{String(productInfo.productPrice*100).substring(String(productInfo.productPrice*100).length-2)}}
 				</view>
 			</view>
 		</view>
@@ -55,16 +55,17 @@
 		// width: calc(50% - 20rpx);
 		width: 345rpx;
 		box-sizing: border-box;
-		padding: 10rpx;
+		// padding: 10rpx;
 		margin: 10rpx;
 
 		image {
 			width: 100%;
 			display: block;
+			border-radius: 16rpx;
 		}
 
 		.content {
-			padding: 0 20rpx;
+			padding: 20rpx;
 
 			.name {
 				font-size: 28rpx;
