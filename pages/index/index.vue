@@ -85,6 +85,7 @@
 					}
 				});
 				if (result.code === 200) {
+					// 判断是否没有数据
 					if (result.data.list.length === 0 && this.pageNo != 1 ) {
 							this.isOver = true;
 							uni.showToast({
